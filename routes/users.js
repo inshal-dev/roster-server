@@ -1,10 +1,59 @@
- const User = require('../schemas/userSchema');
+ const User = require('../schemas/userSchema');  
+ const bcrypt = require('bcrypt');
+ const jwt = require('jsonwebtoken');
+ require('dotenv').config();
+ 
+ 
+ exports.userRegister = async (req, res)=>{
+  try {
+      if(req.body.email != ''){
+          req.body.password = await bcrypt.hash(req.body.password, 10);
+          //create a user
+          const user = await User.create(req.body);
+          console.log(user._id)
+          res.json(user);
+      }
+  }catch{
+      res.status(400).json({error});
+  }
+}
+
+exports.userLogin = async(req, res)=>{ 
+        try{ 
+            const user = await User.findOne({email: req.body.email});
+            console.log(user);
+            if(user){
+                const pass = await bcrypt.compare(req.body.passwd, user.password)
+                console.log(pass);
+
+                if(pass){
+                    console.log('Inpassword function')
+                    console.log(user._id ,process.env.JWT_SECRET_KEY);
+                    const token = await jwt.sign({_id: user._id}, process.env.JWT_TOKEN);
+                    console.log(token);
+                    res.json({ token: token, userId: user._id}).status(200);
+                }else{
+                    res.status(400).json({error: "Incorrect Password"});
+                }
+           }else{
+            res.status(400).json({error: "User doesn't exist"});
+           }
+        }catch{
+            res.status(400).json({error:'ERROR'});
+        }
+}
+
+
+
 
 exports.userData = async (req, res) => {
   try{
+    userPassword = await bcrypt.hash('Inshal@i', 10)
+    console.log(userPassword)
     let user = {
-      username: "Temp",
-      email:'temp@sada.cin'
+      username: "pmohamma",
+      email:'mohammadinshal@gmail.com',
+      password: userPassword  
     }
 
     const userdata = User.create(user);
