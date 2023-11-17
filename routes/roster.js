@@ -1,9 +1,13 @@
-const RosterData = require('../schemas/userSchema');
+const RosterData = require('../schemas/userRosterSchema');
 
 
 exports.userRoster = async(req, res) => {
 
     try{
+        // console.log(req.body.userId);
+        // let previousData = await RosterData.findOneAndReplace({userId: req.body.userId })
+        // console.log(previousData)
+        
         const data = {
             userId: req.body.userId,
             currentMonth: req.body.currentMonth,
@@ -11,10 +15,11 @@ exports.userRoster = async(req, res) => {
         };
         console.log(data);
 
-        const rosterData = RosterData.create(data)
-        let status = 'User is added in database'
+        const rosterData = await RosterData.create(data)
+        console.log(rosterData);
+        let status = {"response": 'User is added in database', data : rosterData}
         res.send(status).status(200);
-    }catch{
-        res.send('Data not add').status(400)
+    }catch(err){ 
+        res.send(err).status(400)
     }
 }
