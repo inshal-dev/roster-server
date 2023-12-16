@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
  
 const userRosterSchema = new mongoose.Schema({ 
    userId: String,
+   username: String,
    currentMonth:String,
    roster:Array,
 })

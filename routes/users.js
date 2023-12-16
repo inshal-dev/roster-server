@@ -25,13 +25,13 @@ exports.userLogin = async(req, res)=>{
             if(user){
                 const pass = await bcrypt.compare(req.body.passwd, user.password)
                 console.log(pass);
-
+                
                 if(pass){
                     console.log('Inpassword function')
-                    console.log(user._id ,process.env.JWT_SECRET_KEY);
+                   // console.log(user._id ,process.env.JWT_TOKEN);
                     const token = await jwt.sign({_id: user._id}, process.env.JWT_TOKEN);
                     console.log(token);
-                    res.json({ token: token, userId: user._id}).status(200);
+                    res.json({ token: token, username: user.username, userId: user._id, admin: user.admin}).status(200);
                 }else{
                     res.status(400).json({error: "Incorrect Password"});
                 }
@@ -48,12 +48,13 @@ exports.userLogin = async(req, res)=>{
 
 exports.userData = async (req, res) => {
   try{
-    userPassword = await bcrypt.hash('Inshal@i', 10)
+    userPassword = await bcrypt.hash('zoheb@i', 10)
     console.log(userPassword)
     let user = {
-      username: "pmohamma",
-      email:'mohammadinshal@gmail.com',
-      password: userPassword  
+      username: "Zoheb Waghu",
+      email:'Zoheb@gmail.com',
+      password: userPassword,
+      admin:true  
     }
 
     const userdata = User.create(user);

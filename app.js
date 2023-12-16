@@ -48,7 +48,9 @@ app.get('/', indexRouter.homePage);
 app.get('/users',usersRouter.userData);
 app.post('/user-login',usersRouter.userLogin)
 app.get('/user-data',usersRouter.userInfo);
-app.post('/current-roster', rosterRouter.userRoster)
+app.post('/current-roster', rosterRouter.userRoster) 
+app.post('/user-check', rosterRouter.sendUserRoster)
+app.get('/rosters', rosterRouter.getAllUserRoster)
 app.listen(3000, ()=>{
     console.log('Server is Up')
 })
