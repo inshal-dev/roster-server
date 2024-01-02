@@ -7,11 +7,16 @@ const cors = require('cors');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const rosterRouter = require('./routes/roster');
-
 const app = express();
+//const httpServer = require('http').createServer(app);
+const io = require('socket.io')(app, {
+  cors: {origin : '*'}
+});
+const port = process.env.PORT || 3000;
 
-const mongoose = require("mongoose");
-const { log } = require('console');
+const UserRoster = require('./schemas/userRosterSchema');
+
+const mongoose = require("mongoose");  
 require("dotenv").config();
 
 mongoose.connect(
@@ -51,7 +56,28 @@ app.get('/user-data',usersRouter.userInfo);
 app.post('/current-roster', rosterRouter.userRoster) 
 app.post('/user-check', rosterRouter.sendUserRoster)
 app.get('/rosters', rosterRouter.getAllUserRoster)
-app.listen(3000, ()=>{
-    console.log('Server is Up')
-})
+app.post('/publish-roster', rosterRouter.publishRoster)
+
+
+//socket 
+
+ 
+io.on('connection', (socket) => {
+    console.log('a user connected');
   
+    socket.on('userRosterUpdate', async (data) => {
+      console.log(data);
+     // const rosterUpdated =  UserRoster.update(data)
+      io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${message}`);
+    });
+  
+    socket.on('disconnect', () => {
+      console.log('a user disconnected!');
+    });
+  });
+  
+  httpServer.listen(port, () => console.log(`listening on port ${port}`));
+
+  app.listen(()=>{
+    console.log('Server is Up')
+  }, 3100)

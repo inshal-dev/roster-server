@@ -1,8 +1,6 @@
 const UserRoster = require('../schemas/userRosterSchema');
 const RosterData = require('../schemas/userRosterSchema');
-const mongoose = require('mongoose');
-const User = require('../schemas/userSchema');
-
+const AdminRoster = require('../schemas/adminRosterSchema')
 
 exports.userRoster = async(req, res) => { 
     try{ 
@@ -62,3 +60,23 @@ exports.getAllUserRoster = async(req, res) =>{
     }
 }
  
+
+exports.publishRoster = async(req, res) =>{
+    try{
+        const rosterObject = req.body.data;
+         
+        
+ 
+        const monthRoster = {
+            month : rosterObject[0].currentMonth,
+            roster: rosterObject
+        }
+
+        console.log(monthRoster);
+        let publishRoster = await AdminRoster.create(monthRoster)
+
+        res.send({res: 'Roster is published', data: publishRoster}).status(200)
+    }catch(err){
+        res.send(err).status(400)
+    }
+}
