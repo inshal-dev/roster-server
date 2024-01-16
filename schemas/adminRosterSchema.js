@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
- 
-const rosterSchema = new mongoose.Schema({ 
+const mongoose = require("mongoose"); 
+const rosterSchema = new mongoose.Schema({  
+   state:Boolean,
    month: String,
    roster:Array
 })

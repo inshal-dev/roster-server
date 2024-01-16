@@ -8,14 +8,13 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const rosterRouter = require('./routes/roster');
 const app = express();
-//const httpServer = require('http').createServer(app);
-const io = require('socket.io')(app, {
+const httpServer = require('http').createServer(app);
+const io = require('socket.io')(httpServer, {
   cors: {origin : '*'}
 });
 const port = process.env.PORT || 3000;
-
-const UserRoster = require('./schemas/userRosterSchema');
-
+ 
+const AdminRoster = require('./schemas/adminRosterSchema')
 const mongoose = require("mongoose");  
 require("dotenv").config();
 
@@ -62,13 +61,37 @@ app.post('/publish-roster', rosterRouter.publishRoster)
 //socket 
 
  
-io.on('connection', (socket) => {
-    console.log('a user connected');
+io.on('connection', (socket) => { 
+    socket.on('userRosterUpdate', async (data) => { 
+    const rosterPublish = await AdminRoster.findByIdAndUpdate(data._id, {roster:data.roster});
+    //sending modified data 
+    const rosterPublished = await AdminRoster.find()
+    if(rosterPublish){
+      const modifiedRoster = rosterPublished.map(item => ({
+        _id: item._id, 
+        roster: item.roster.map(entry => ({
+            _id: entry._id,
+            userId: entry.userId,
+            username: entry.username,
+            currentMonth: entry.currentMonth,
+            roster: entry.roster
+        }))
   
-    socket.on('userRosterUpdate', async (data) => {
+    }));
+    }
+   
+    if(rosterPublish){ 
+      console.log(rosterPublish)
+    }else{
       console.log(data);
-     // const rosterUpdated =  UserRoster.update(data)
-      io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${message}`);
+      data = {
+        state:false,
+        roster:data.roster, 
+      }
+      const rosterCreate = await AdminRoster.create(data) 
+    } 
+   
+      io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${modifiedRoster}`);
     });
   
     socket.on('disconnect', () => {
@@ -76,8 +99,12 @@ io.on('connection', (socket) => {
     });
   });
   
-  httpServer.listen(port, () => console.log(`listening on port ${port}`));
 
-  app.listen(()=>{
-    console.log('Server is Up')
-  }, 3100)
+
+  httpServer.listen(port, () => {
+    console.log(`listening on port ${port}`)
+  });
+
+  // app.listen(()=>{
+  //   console.log('Server is Up')
+  // }, 3100)
