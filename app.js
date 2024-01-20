@@ -66,8 +66,8 @@ io.on('connection', (socket) => {
     const rosterPublish = await AdminRoster.findByIdAndUpdate(data._id, {roster:data.roster});
     //sending modified data 
     const rosterPublished = await AdminRoster.find()
-    if(rosterPublish){
-      const modifiedRoster = rosterPublished.map(item => ({
+     
+    const modifiedRoster = rosterPublished.map(item => ({
         _id: item._id, 
         roster: item.roster.map(entry => ({
             _id: entry._id,
@@ -77,8 +77,7 @@ io.on('connection', (socket) => {
             roster: entry.roster
         }))
   
-    }));
-    }
+    })); 
    
     if(rosterPublish){ 
       console.log(rosterPublish)
