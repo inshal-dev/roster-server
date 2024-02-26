@@ -68,7 +68,7 @@ exports.userData = async (req, res) => {
 
 exports.userInfo = async (req, res) =>{
   try{
-    const user = await User.find();
+    const user = await User.find(); 
     res.send(user)
   }catch{
     res.status(400).send({error: "No task avaliable"})

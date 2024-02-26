@@ -5,6 +5,7 @@
     email: String,
     password:String,
     admin:Boolean
+    
  })
 
  const User = mongoose.model('users', userSchema);

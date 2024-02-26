@@ -54,20 +54,37 @@ app.post('/user-login',usersRouter.userLogin)
 app.get('/user-data',usersRouter.userInfo);
 app.post('/current-roster', rosterRouter.userRoster) 
 app.post('/user-check', rosterRouter.sendUserRoster)
-app.get('/rosters', rosterRouter.getAllUserRoster)
+app.post('/rosters', rosterRouter.getAllUserRoster)
 app.post('/publish-roster', rosterRouter.publishRoster)
 
 
-//socket 
-
+//socket  
  
 io.on('connection', (socket) => { 
     socket.on('userRosterUpdate', async (data) => { 
-    const rosterPublish = await AdminRoster.findByIdAndUpdate(data._id, {roster:data.roster});
+    // Step 1: Check if already object present of particular user
+    // Step 2: If: true return updated the current value in it
+    // Step 3: If: False : Create a new Object.  
     //sending modified data 
-    const rosterPublished = await AdminRoster.find()
-     
-    const modifiedRoster = rosterPublished.map(item => ({
+    
+     const rosterPublished = await AdminRoster.find()
+     //get length of Admin roster data 
+     let lengthOfAdminRoster = rosterPublished.length 
+    
+  
+    //creating new Object for new user Roster
+
+    let newDataObject = {
+      state:false, 
+      month:data.roster[0].currentMonth,
+      roster:data.roster, 
+    }
+ 
+
+    if(lengthOfAdminRoster == 0){ 
+      const rosterCreate = await AdminRoster.create(newDataObject); 
+      console.log('roster Created', rosterCreate)
+      const modifiedRoster = rosterPublished.map(item => ({ 
         _id: item._id, 
         roster: item.roster.map(entry => ({
             _id: entry._id,
@@ -75,22 +92,18 @@ io.on('connection', (socket) => {
             username: entry.username,
             currentMonth: entry.currentMonth,
             roster: entry.roster
-        }))
+        }), console.log(item) )
   
     })); 
-   
-    if(rosterPublish){ 
+    io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${modifiedRoster}`);
+    }else{   
+      console.log(data._id);
+      const rosterPublish = await AdminRoster.findByIdAndUpdate(data._id, {roster:data.roster});
+     
       console.log(rosterPublish)
-    }else{
-      console.log(data);
-      data = {
-        state:false,
-        roster:data.roster, 
-      }
-      const rosterCreate = await AdminRoster.create(data) 
     } 
    
-      io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${modifiedRoster}`);
+   //   io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${modifiedRoster}`);
     });
   
     socket.on('disconnect', () => {

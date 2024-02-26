@@ -35,10 +35,13 @@ exports.userRoster = async(req, res) => {
     }
 }
 
-exports.sendUserRoster = async(req, res) =>{
+exports.sendUserRoster = async (req, res) =>{
     try {
         const userId = req.body.userId; 
-        const userRosterData = await RosterData.find({ userId: userId }); 
+        const month = req.body.month;
+        console.log(month);
+        const userRosterData = await RosterData.find({ userId: userId, currentMonth:month  }); 
+        console.log(userRosterData);
         if(userRosterData){
             res.send({rosterData: userRosterData}).status(200);
         }else{
@@ -49,18 +52,23 @@ exports.sendUserRoster = async(req, res) =>{
     }
 }
 
-exports.getAllUserRoster = async(req, res) =>{
+exports.getAllUserRoster = async (req, res) =>{
     try{
+        console.log('in try')
+        const monthSelected = req.body.data
+        console.log(monthSelected);
         //write administrative logic  
-        console.log(req.headers.authorization)
-        const findAdmin = await Users.findById({_id: req.headers.id});
-        console.log(findAdmin);  
-        if(findAdmin.admin){
-            const rosterPublish = await AdminRoster.find(); 
+        console.log(monthSelected);
+        const findAdmin = await Users.findOne({username: req.headers.id});
+        
+       if(findAdmin.admin){ 
+            const rosterPublish = await AdminRoster.find({month: monthSelected}); 
+
+        //    console.log('Check', rosterPublish);
             if (rosterPublish.length > 0) {
                 // Modify the structure of the data before sending the response
                 const modifiedRoster = rosterPublish.map(item => ({
-                    _id: item._id, 
+                    _id: item._id,  
                     roster: item.roster.map(entry => ({
                         _id: entry._id,
                         userId: entry.userId,
@@ -71,15 +79,16 @@ exports.getAllUserRoster = async(req, res) =>{
                 })); 
                 res.send({ res: 'pre-published', data: modifiedRoster });
             }else{
-                const userRostersData = await UserRoster.find();  
+                const userRostersData = await UserRoster.find({currentMonth: monthSelected});  
                 res.send({res:'all-merged', data: userRostersData} ).status(200);
             }
+ 
         }else{
             res.send({res:'404'}).status(200)
-        }
-        
+        } 
          
     }catch(err){
+        console.log(err)
         res.send(err).status(400);
     } 
 }
@@ -108,3 +117,22 @@ exports.publishRoster = async(req, res) =>{
     }
 }
 
+
+exports.getPublishedRoterForUser = async(req, res) => {
+
+    try{
+        const userId = req.body._id
+        console.log(userId)
+        if(userId){
+            const userRoster = AdminRoster.findOne({_id: userId})
+            console.log(userRoster)
+            res.send({data:userRoster}).sendStatus(200);
+        }else{
+            console.log('User does not exist')
+        }
+
+    }catch(err){
+        res.send(err).sendStatus(400)
+    }
+
+}
