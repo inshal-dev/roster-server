@@ -56,7 +56,7 @@ app.post('/current-roster', rosterRouter.userRoster)
 app.post('/user-check', rosterRouter.sendUserRoster)
 app.post('/rosters', rosterRouter.getAllUserRoster)
 app.post('/publish-roster', rosterRouter.publishRoster)
-
+app.get('/create-user-rosters', rosterRouter.createRosterforAllUser)
 
 //socket  
  
@@ -92,7 +92,7 @@ io.on('connection', (socket) => {
             username: entry.username,
             currentMonth: entry.currentMonth,
             roster: entry.roster
-        }), console.log(item) )
+        }),   )
   
     })); 
     io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${modifiedRoster}`);
@@ -100,7 +100,7 @@ io.on('connection', (socket) => {
       console.log(data._id);
       const rosterPublish = await AdminRoster.findByIdAndUpdate(data._id, {roster:data.roster});
      
-      console.log(rosterPublish)
+      //console.log(rosterPublish)
     } 
    
    //   io.emit('userRosterUpdate', `${socket.id.substr(0, 2)} said ${modifiedRoster}`);

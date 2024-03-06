@@ -48,13 +48,13 @@ exports.userLogin = async(req, res)=>{
 
 exports.userData = async (req, res) => {
   try{
-    userPassword = await bcrypt.hash('zoheb@i', 10)
+    userPassword = await bcrypt.hash('akhilesh@i', 10)
     console.log(userPassword)
     let user = {
-      username: "Zoheb Waghu",
-      email:'Zoheb@gmail.com',
+      username: "Akhilesh",
+      email:'akhilesh@gmail.com',
       password: userPassword,
-      admin:true  
+      admin:false  
     }
 
     const userdata = User.create(user);
