@@ -210,18 +210,17 @@ exports.getPublishedRoterForUser = async(req, res) => {
         const months = req.body.month;
         console.log("Line: 212", userId, months);
     
-    if (userId) {
+    if (userId, months) {
         const userRoster = await AdminRoster.find({state: true, month:months}); // Find the roster with matching userId
-        console.log("Line: 215", userRoster.length);
+      //  console.log("Line: 215", userRoster.length);
         if (userRoster.length > 0) {
             // Filter the roster array to get only the object containing the specific user's roster
-            const dataRoster = userRoster[0].roster
-            console.log(dataRoster)
+            const dataRoster = userRoster[0].roster 
             const userRosterData = dataRoster.filter(item => item.userId == userId);
             res.status(200).send({ data: userRosterData }); // Send the filtered roster data
         } else {
             console.log('User roster not found');
-            res.status(404).send({ message: 'User roster not found' }); // Send a 404 status if user roster not found
+            res.status(200).send({ message: 'User roster not found', data: 0 }); // Send a 404 status if user roster not found
         }
     } else {
         console.log('User ID not provided');
