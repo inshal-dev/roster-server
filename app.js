@@ -57,7 +57,7 @@ app.post('/user-check', rosterRouter.sendUserRoster)
 app.post('/rosters', rosterRouter.getAllUserRoster)
 app.post('/publish-roster', rosterRouter.publishRoster)
 app.get('/create-user-rosters', rosterRouter.createRosterforAllUser)
-
+app.post('/user-published-roster', rosterRouter.getPublishedRoterForUser)
 //socket  
  
 io.on('connection', (socket) => { 

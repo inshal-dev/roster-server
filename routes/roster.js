@@ -205,20 +205,33 @@ exports.publishRoster = async(req, res) =>{
 
 
 exports.getPublishedRoterForUser = async(req, res) => {
-
     try{
-        const userId = req.body._id
-        console.log(userId)
-        if(userId){
-            const userRoster = AdminRoster.findOne({_id: userId})
-            console.log(userRoster)
-            res.send({data:userRoster}).sendStatus(200);
-        }else{
-            console.log('User does not exist')
+        const userId = req.body._id;
+        const months = req.body.month;
+        console.log("Line: 212", userId, months);
+    
+    if (userId) {
+        const userRoster = await AdminRoster.find({state: true, month:months}); // Find the roster with matching userId
+        console.log("Line: 215", userRoster.length);
+        if (userRoster.length > 0) {
+            // Filter the roster array to get only the object containing the specific user's roster
+            const dataRoster = userRoster[0].roster
+            console.log(dataRoster)
+            const userRosterData = dataRoster.filter(item => item.userId == userId);
+            res.status(200).send({ data: userRosterData }); // Send the filtered roster data
+        } else {
+            console.log('User roster not found');
+            res.status(404).send({ message: 'User roster not found' }); // Send a 404 status if user roster not found
         }
-
-    }catch(err){
-        res.send(err).sendStatus(400)
+    } else {
+        console.log('User ID not provided');
+        res.status(400).send({ message: 'User ID not provided' }); // Send a 400 status if user ID is not provided
     }
 
+} catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Internal server error' }); // Send a 500 status for any internal server errors
 }
+}
+    
+ 
